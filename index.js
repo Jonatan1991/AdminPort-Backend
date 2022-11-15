@@ -10,19 +10,17 @@ const app = express();
 //Cors config
 app.use(cors());
 
+//Readin Body
+app.use( express.json() );
+
 
 //Database
 dbConnection();
 
 
 //Routs
-app.get('/', (req, res) =>{
+app.use( '/api/masterDevices', require('./routes/masterDevices'));
 
-    res.json({ 
-        ok: true,
-        msg: 'Jonatan'
-    })
-});
 
 app.listen( process.env.PORT , () => {
     console.log('Servidor corriendo en el puerto ' + process.env.PORT);
