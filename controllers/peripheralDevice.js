@@ -1,36 +1,35 @@
 const { response } = require('express');
-const MasterDevice = require('../models/masterDevice');
+const PeripheralDevice = require('../models/peripheralDevice ');
 
 
-const getDevices = async (req, res) => {
-    const masterDevices = await MasterDevice.find()
-    // .populate('gateway', 'name ip')
-    ;
+const getPeripheralDevices = async (req, res) => {
+    const peripheralDevice = await PeripheralDevice.find().populate('gateway', 'name ip');
     res.json({
         ok: true,
-        masterDevices
+        peripheralDevice
     });
 };
 
-const createDevices = async (req, res = response) => {
-    const { device, description } = req.body;
+const createPeripheralDevice = async (req, res = response) => {
+    const { name, vendor, date, gateway } = req.body;
+    const device = new PeripheralDevice(req.body);
     try {
-        const repeatDevice = await MasterDevice.findOne({ device });
+        const repeatDevice = await PeripheralDevice.findOne({ name });
+
         if (repeatDevice) {
             return res.status(400).json({
                 ok: false,
-                msg: 'The Device exist'
+                msg: 'The Peripheral Device exist'
             });
         }
 
-        const masterDevice = new MasterDevice(req.body);
 
-        await masterDevice.save();
+        const deviceDB = await device.save();
         // console.log( req.body );
 
         res.json({
             ok: true,
-            masterDevice
+            deviceDB
         })
 
     } catch (error) {
@@ -46,7 +45,7 @@ const updateDevice = async (req, res = response) => {
 
     const id = req.params.id;
     try {
-        const deviceDB = await MasterDevice.findById(id);
+        const deviceDB = await PeripheralDevice.findById(id);
 
         if (!deviceDB) {
             return res.status(404).json({
@@ -57,23 +56,24 @@ const updateDevice = async (req, res = response) => {
 
         const fields = req.body;
 
-        if (deviceDB.device === req.body.device) {
-            delete fields.device;
-        } else {
-            const existDevice = await MasterDevice.findOne({ device: req.body.device });
-            if (existDevice) {
-                return res.status(400).json({
-                    ok: false,
-                    msg: 'Exist a Device by same name',
-                })
-            }
-        }
+        // if (deviceDB.name === req.body.name) {
+        //     delete fields.name;
+        // } else {
+        //     const existDevice = await PeripheralDevice.findOne({ device: req.body.name });
+        //     if (existDevice) {
+        //         return res.status(400).json({
+        //             ok: false,
+        //             msg: 'Exist a Device by same name 1',
+        //         })
+        //     }
+        // }
 
-        const deviceUpdated = await MasterDevice.findByIdAndUpdate(id, fields, { new: true });
+        const deviceUpdated = await PeripheralDevice.findByIdAndUpdate(id, fields, { new: true });
 
         res.json({
             ok: true,
-            deviceUpdated: 'Device update correctly'
+            msg: 'Device update correctly',
+            deviceUpdated
         })
 
     } catch (error) {
@@ -89,7 +89,7 @@ const deleteDevice = async (req, res = response) => {
 
     const id = req.params.id;
     try {
-        const deviceDB = await MasterDevice.findById(id);
+        const deviceDB = await PeripheralDevice.findById(id);
 
         if (!deviceDB) {
             return res.status(404).json({
@@ -98,7 +98,7 @@ const deleteDevice = async (req, res = response) => {
             });
         }
 
-     await MasterDevice.findByIdAndDelete(id);
+        await PeripheralDevice.findByIdAndDelete(id);
 
         res.json({
             ok: true,
@@ -116,8 +116,8 @@ const deleteDevice = async (req, res = response) => {
 }
 
 module.exports = {
-    getDevices,
-    createDevices,
+    getPeripheralDevices,
+    createPeripheralDevice,
     updateDevice,
     deleteDevice
 }

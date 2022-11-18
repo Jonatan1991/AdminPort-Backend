@@ -20,6 +20,8 @@ dbConnection();
 
 //Routs
 app.use( '/api/masterDevices', require('./routes/masterDevices'));
+app.use( '/api/gateway', require('./routes/gateway'));
+app.use( '/api/peripheralDevice', require('./routes/peripheralDevice'));
 
 
 app.listen( process.env.PORT , () => {
